@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Humanizer;
 
 namespace Nezamikaj.Obrazovku
 {
@@ -60,7 +61,8 @@ namespace Nezamikaj.Obrazovku
                     {
                         //Console.WriteLine($"Timer will close app in {secondsLeft} seconds.");
                         Console.SetCursorPosition(0, Console.CursorTop);
-                        Console.Write($"Timer will close app in {secondsLeft} seconds.");
+                        string txt = TimeSpan.FromSeconds(secondsLeft.Value).Humanize(3);                        
+                        Console.Write($"Timer will close app in {txt} seconds.");
                     }
 
                     if (Console.KeyAvailable)
