@@ -17,18 +17,19 @@ namespace Nezamikaj.Obrazovku
             Console.WriteLine("To Stop Press Escape or Q");
 
 #if DEBUG
-            //args = new string[] { "120" };
+            //args = new string[] { "5" };
 #endif
 
             int? secondsLeft = null;
             if (args != null && args.Count() > 0)
             {
                 var s = args.FirstOrDefault();
-                if (int.TryParse(s, out int sec))
+                if (int.TryParse(s, out int min))
                 {
-                    Console.WriteLine($"Timer set to {sec} seconds.");
-                    var ts = new TimeSpan(0, 0, 0, sec);
-                    secondsLeft = sec;
+                    Console.WriteLine($"Timer set to {min} minutes.");
+                    //var ts = new TimeSpan(0, 0, 0, sec);
+                    var ts = new TimeSpan(0, 0, min, 0);
+                    secondsLeft = min * 60;
                     timer = new Timer((a) => 
                     {
                         timer.Dispose();
@@ -62,7 +63,7 @@ namespace Nezamikaj.Obrazovku
                         //Console.WriteLine($"Timer will close app in {secondsLeft} seconds.");
                         Console.SetCursorPosition(0, Console.CursorTop);
                         string txt = TimeSpan.FromSeconds(secondsLeft.Value).Humanize(3);                        
-                        Console.Write($"Timer will close app in {txt} seconds.");
+                        Console.Write($"Timer will close app in {txt}.");
                     }
 
                     if (Console.KeyAvailable)
