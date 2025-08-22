@@ -13,15 +13,21 @@ namespace Nezamikaj.Obrazovku
         {
             bool stop = false;
             Timer timer = null;
+            Console.WriteLine("To Stop Press Escape or Q");
 
+#if DEBUG
+            args = new string[] { "120" };
+#endif
+
+            int? secondsLeft = null;
             if (args != null && args.Count() > 0)
             {
                 var s = args.FirstOrDefault();
                 if (int.TryParse(s, out int sec))
                 {
-                    Console.WriteLine($"Set timer to close app in {sec}");
+                    Console.WriteLine($"Timer set to {sec} seconds.");
                     var ts = new TimeSpan(0, 0, 0, sec);
-
+                    secondsLeft = sec;
                     timer = new Timer((a) => 
                     {
                         timer.Dispose();
@@ -33,7 +39,7 @@ namespace Nezamikaj.Obrazovku
             UInt32 postX = 20;
             UInt32 postY = 20;
             UInt32 posMax = 500;
-            Console.WriteLine("To Stop Press Escape");
+            //Console.WriteLine("To Stop Press Escape or Q");
             while (!stop)
             {
                 for(UInt32 x = 0; x <= posMax; x++ )
@@ -41,12 +47,21 @@ namespace Nezamikaj.Obrazovku
 
                     postX = x;
                     Random rand = new Random();
-                    var del = rand.Next(2, 20);
-                    postY = (UInt32)del;
-                    Thread.Sleep(del * 1000);
+                    var delaySec = rand.Next(2, 20);
+                    postY = (UInt32)delaySec;
+                    Thread.Sleep(delaySec * 1000);
+                    if (secondsLeft.HasValue)                    
+                        secondsLeft = secondsLeft - delaySec;                    
 
                     Win32.mouse_event((int)(Win32.MouseEventFlags.MOVE), postX, postY, 0, 0);
                     Win32.mouse_event((int)(Win32.MouseEventFlags.LEFTDOWN), postX, postY, 0, 0);
+
+                    if (timer != null)
+                    {
+                        //Console.WriteLine($"Timer will close app in {secondsLeft} seconds.");
+                        Console.SetCursorPosition(0, Console.CursorTop);
+                        Console.Write($"Timer will close app in {secondsLeft} seconds.");
+                    }
 
                     if (Console.KeyAvailable)
                     {
