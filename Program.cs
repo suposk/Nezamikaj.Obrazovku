@@ -17,7 +17,7 @@ namespace Nezamikaj.Obrazovku
             Console.WriteLine("To Stop Press Escape or Q");
 
 #if DEBUG
-            args = new string[] { "120" };
+            //args = new string[] { "120" };
 #endif
 
             int? secondsLeft = null;
