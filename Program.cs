@@ -10,7 +10,9 @@ namespace Nezamikaj.Obrazovku
 {
     class Program
     {
-        static void Main(string[] args)
+        // Change 'async void Main' to 'static async Task Main' and make MoveMouseLoopAsync static
+
+        static async Task Main(string[] args)
         {
             bool stop = false;
             Timer timer = null;
@@ -30,7 +32,7 @@ namespace Nezamikaj.Obrazovku
                     //var ts = new TimeSpan(0, 0, 0, sec);
                     var ts = new TimeSpan(0, 0, min, 0);
                     secondsLeft = min * 60;
-                    timer = new Timer((a) => 
+                    timer = new Timer((a) =>
                     {
                         timer.Dispose();
                         Environment.Exit(0);
@@ -38,58 +40,61 @@ namespace Nezamikaj.Obrazovku
                 }
             }
 
+            var cts = new CancellationTokenSource();            
             UInt32 postX = 20;
-            UInt32 postY = 20;
-            UInt32 posMax = 500;
+            Task moveTask = MoveMouseLoopAsync(postX, secondsLeft, timer, cts.Token);
             //Console.WriteLine("To Stop Press Escape or Q");
             while (!stop)
             {
-                for(UInt32 x = 0; x <= posMax; x++ )
+                if (Console.KeyAvailable)
                 {
+                    ConsoleKeyInfo key = Console.ReadKey(true);
+                    switch (key.Key)
+                    {
+                        case ConsoleKey.Q:
+                        case ConsoleKey.Escape:
+                            {
+                                //Console.WriteLine("--------------");
+                                Console.WriteLine();
+                                Console.WriteLine($"Pressed key {key.Key} to stop");
+                                timer?.Dispose();
+                                stop = true;
+                                break;
+                            }
+                        default:
+                            break;
+                    }
+                }
+            }
+        }
 
+        static async Task MoveMouseLoopAsync(UInt32 max, int? secondsLeft, Timer timer, CancellationToken token)
+        {
+            UInt32 postX = max;
+            UInt32 postY = max;
+            while (!token.IsCancellationRequested)
+            {
+                for (UInt32 x = 0; x <= max; x++)
+                {
                     postX = x;
                     Random rand = new Random();
                     var delaySec = rand.Next(2, 20);
                     postY = (UInt32)delaySec;
-                    Thread.Sleep(delaySec * 1000);
-                    if (secondsLeft.HasValue)                    
-                        secondsLeft = secondsLeft - delaySec;                    
+                    await Task.Delay(delaySec * 1000, token);
+                    if (secondsLeft.HasValue)
+                        secondsLeft = secondsLeft - delaySec;
 
                     Win32.mouse_event((int)(Win32.MouseEventFlags.MOVE), postX, postY, 0, 0);
                     Win32.mouse_event((int)(Win32.MouseEventFlags.LEFTDOWN), postX, postY, 0, 0);
 
-                    if (timer != null)
+                    if (timer != null && secondsLeft.HasValue)
                     {
-                        //Console.WriteLine($"Timer will close app in {secondsLeft} seconds.");
                         Console.SetCursorPosition(0, Console.CursorTop);
-                        string txt = TimeSpan.FromSeconds(secondsLeft.Value).Humanize(3);                        
+                        string txt = TimeSpan.FromSeconds(secondsLeft.Value).Humanize(3);
                         Console.Write($"Timer will close app in {txt}.");
                     }
-
-                    if (Console.KeyAvailable)
-                    {
-                        ConsoleKeyInfo key = Console.ReadKey(true);
-                        switch (key.Key)
-                        {
-                            case ConsoleKey.Q:
-                            case ConsoleKey.Escape:
-                                {
-                                    Console.WriteLine("pressed key to stop");
-                                    timer?.Dispose();
-                                    stop = true;
-                                    break;
-                                }
-                            default:
-                                break;
-                        }
-                    }
-                    if (stop)
-                        break;
                 }
-
             }
-
-
         }
     }
 }
