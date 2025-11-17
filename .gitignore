@@ -14,8 +14,8 @@
 *.userprefs
 
 # Build results
-[Dd]ebug/
-[Dd]ebugPublic/
+#[Dd]ebug/
+#[Dd]ebugPublic/
 [Rr]elease/
 [Rr]eleases/
 x64/
@@ -214,7 +214,7 @@ _pkginfo.txt
 !?*.[Cc]ache/
 
 # Others
-ClientBin/
+#ClientBin/
 ~$*
 *~
 *.dbmdl
